@@ -30,6 +30,7 @@ DEFAULT_MEDIA_MOUNT_POINT="media"
 SSH_KEY='ssh/id_rsa'
 DNS_SERVER_ADDR='8.8.8.8'
 PRIVILEGE_NEED=(lib bin include)
+CPA_NEED=(/usr/local/bin/node /usr/local/bin/ruby)
 
 GIT_CONFIG=(
   'alias.ac "!git add -A && git commit"'
@@ -54,8 +55,6 @@ df -Tlh
 sudo update
 sudo core
 sudo dependency
-sudo setcap
-sudo mod-owner
 sudo rc-local
 sudo config-dns
 sudo config-proxy
@@ -64,6 +63,43 @@ sudo utility
 config-github-account
 setup-xdg-userdir
 setup-user-dirs
+
+# fish shell
+
+cp -R ./fish/ ~/.config/fish/
+chsh -s /usr/local/bin/fish
+
+# Ruby
+
+gem install ${GEM[*]}
+
+# Node, Coffee
+
+npm install ${NPM[*]}
+
+# Lua
+
+# CLisp
+
+# MongoDB
+
+cp ./mongodb.conf ~/uconfig
+sudo ln -s ~/uconfig/mongodb.conf /etc/mongodb.conf
+
+# Redis
+
+cp ./redis.conf ~/uconfig
+sudo ln -s ~/uconfig/redis.conf /etc/redis.conf
+
+# LevelDB
+
+# RethinkDB
+
+cp ./rethinkdb.conf ~/uconfig
+sudo ln -s ~/uconfig/rethinkdb.conf /etc/rethinkdb/default.conf.sample
+
+sudo setcap ${CAP_NEED[*]}
+sudo mod-owner ${PRIVILEGE_NEED[*]}
 
 read -p '设置需要挂载的设备:(若多个设备以空格分割, 留空则跳过设置)' device
 [[ -z $device ]] || ntfs-auto-mount $device
@@ -160,11 +196,11 @@ config-github-account() {
 
   # 生成SSH秘钥对
   ssh-keygen -t rsa -C $email
-  ssh-add .ssh/id_rsa
+  ssh-add $SSH_KEY
 
   while true
   do
-    echo "公钥路径: .ssh/id_rsa.pub"
+    echo "公钥路径: ${SSH_KEY}.pub"
     echo "复制公钥内容, 在github新建SSH-Key并粘贴. 完成这一步后输入y"
     read ok
     if [[ $ok == "y" ]]; then
@@ -197,38 +233,3 @@ config-proxy() {
   # 取消更改代理的身份验证机制
   cp ./proxy-settings.xml /usr/share/polkit-1/actions/com.ubuntu.systemservice.policy
 }
-
-
-# fish shell
-
-cp -R ./fish/ ~/.config/fish/
-chsh -s /usr/local/bin/fish
-
-# Ruby
-
-gem install ${GEM[*]}
-
-# Node, Coffee
-
-npm install ${NPM[*]}
-
-# Lua
-
-# CLisp
-
-# MongoDB
-
-cp ./mongodb.conf ~/uconfig
-sudo ln -s ~/uconfig/mongodb.conf /etc/mongodb.conf
-
-# Redis
-
-cp ./redis.conf ~/uconfig
-sudo ln -s ~/uconfig/redis.conf /etc/redis.conf
-
-# LevelDB
-
-# RethinkDB
-
-cp ./rethinkdb.conf ~/uconfig
-sudo ln -s ~/uconfig/rethinkdb.conf /etc/rethinkdb/default.conf.sample
