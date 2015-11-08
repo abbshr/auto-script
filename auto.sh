@@ -233,3 +233,7 @@ config-proxy() {
   # 取消更改代理的身份验证机制
   cp ./proxy-settings.xml /usr/share/polkit-1/actions/com.ubuntu.systemservice.policy
 }
+
+# 恢复14.04之后的平滑字体
+sudo apt-get remove fonts-arphic-ukai
+sudo apt-get remove fonts-arphic-uming
